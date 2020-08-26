@@ -6,10 +6,17 @@ const VoiceRSS={speech:function(e){this._validate(e),this._request(e)},_validate
 const button = document.getElementById('button');
 const audioElement = document.getElementById('audio');
 
-function test(){
+// disable/enable button
+function toggleButton(){
+    button.disabled = !button.disabled;
+}
+
+// Passing joke to voiceRss api
+
+function tellMe(joke){
     VoiceRSS.speech({
         key: '794d418f2e3c4b6789e0d8d1c6b8a7ae',
-        src: 'Hello, world!',
+        src: joke,
         hl: 'en-us',
         v: 'Linda',
         r: 0, 
@@ -19,4 +26,26 @@ function test(){
     });
 }
 
-test()
+
+// Get joke from joke api
+async function getJokesFromApi(){
+    let joke='';
+
+    const jokeApiUrl='https://sv443.net/jokeapi/v2/joke/Programming?blacklistFlags=nsfw,religious,political,racist,sexist&type=single';
+
+    try{
+        const response= await fetch(jokeApiUrl);
+        const data = await response.json();
+        joke=data.joke;
+        //text-to-speech
+        tellMe(joke);
+        // disable button
+        toggleButton();
+    }catch(error){
+        console.log('oops ',error);
+    }
+}
+
+// getJokesFromApi();
+button.addEventListener('click',getJokesFromApi);
+audioElement.addEventListener('ended',toggleButton)
